@@ -71,7 +71,9 @@ count(distinct case when upper(pe.event_type) = 'BIND' THEN pe.event_date end) a
 count(distinct case when upper(pe.event_type) = 'CANCEL' THEN pe.event_date end) as cancels,
 avg(coalesce(case when upper(pe.event_type) = 'QUOTE' then pe.premium_amount end, 0)) as avg_quote_premium,
 avg(coalesce(case when upper(pe.event_type) = 'BIND' then pe.premium_amount end, 0)) as avg_bind_premium,
-avg(coalesce(qb.days_between_quote_and_bind, 0)) as avg_days_quote_bind
+sum(coalesce(case when upper(pe.event_type) = 'BIND' then pe.premium_amount end, 0)) as total_bind_premium,
+avg(coalesce(qb.days_between_quote_and_bind, 0)) as avg_days_quote_bind,
+avg(coalesce(qb.days_between_quote_and_bind, 0)) as total_days_quote_bind
 
 -- from iag_cat.iag.policy_events pe
 from {{ ref('src_policy_events') }} pe
