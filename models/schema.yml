@@ -1,0 +1,74 @@
+version: 2
+
+# flag policy_events and other views
+sources:
+  - name: iag
+    database: iag_cat
+    schema: iag
+    description: Source data from IAG catalogue
+    tables:
+      - name: policy_events
+
+models:
+  - name: quote_bind
+    description: >
+      A view showing each quote and bind sequence for a policy, including the time between quote and bind,
+      the premium amount, and other details at the bind event level.
+    columns:
+      - name: sequence_group
+        description: Unique ID representing a quote-bind lifecycle.
+      - name: bind_policy
+        description: The policy ID associated with the bind event in the sequence.
+        tests:
+          - not_null
+          - unique
+      - name: earliest_quote
+        description: The earliest quote date in the sequence group.
+      - name: earliest_bind
+        description: The earliest bind date in the sequence group.
+      - name: days_between_quote_and_bind
+        description: Number of days between the quote and bind event.
+      - name: bind_state
+        description: The state where the policy was bound.
+      - name: bind_premium
+        description: Premium amount associated with the bind event.
+
+  - name: policy_lifecycle_model
+    description: >
+      A summary model for each policy showing counts of customers, quote/bind/cancel events, 
+      recent premium/channel/state info, and average metrics.
+    columns:
+      - name: policy_id
+        description: Primary key for the policy
+        tests:
+          - not_null
+          - unique
+
+      - name: most_recent_quote_premium
+        description: Premium of the most recent quote event
+      - name: most_recent_quote_channel
+        description: Channel of the most recent quote event
+      - name: most_recent_quote_state
+        description: State of the most recent quote event
+
+      - name: most_recent_bind_premium
+        description: Premium of the most recent bind event
+      - name: most_recent_bind_channel
+        description: Channel of the most recent bind event
+      - name: most_recent_bind_state
+        description: State of the most recent bind event
+
+      - name: customers_on_policy
+        description: Count of unique customers involved in the policy
+      - name: quotes
+        description: Number of quote events for the policy
+      - name: binds
+        description: Number of bind events for the policy
+      - name: cancels
+        description: Number of cancel events for the policy
+      - name: avg_quote_premium
+        description: Average premium amount for quotes on the policy
+      - name: avg_bind_premium
+        description: Average premium amount for binds on the policy
+      - name: avg_days_quote_bind
+        description: Average number of days between quote and bind
